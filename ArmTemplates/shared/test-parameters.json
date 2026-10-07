@@ -1,0 +1,144 @@
+﻿{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environmentTag": {
+            "value": "Dev"
+        },
+        "parentBusinessTag": {
+            "value": "Funding and Allocations"
+        },
+        "portfolioTag": {
+            "value": "Education and Skills Funding Agency"
+        },
+        "productTag": {
+            "value": "Funding Service Digital Forms"
+        },
+        "serviceTag": {
+            "value": "Funding and Allocations"
+        },
+        "serviceLineTag": {
+            "value": "Funding"
+        },
+        "serviceOfferingTag": {
+            "value": "Plan Your Grant"
+        },
+        "sharedKeyVaultName": {
+            "value": "aKeyVaultInstance"
+        },
+        "sharedStorageName": {
+            "value": "digformstestshrdstr"
+        },
+        "sharedAuditStorageName": {
+            "value": "digformsaudit"
+        },
+        "deploymentServicePrincipalId": {
+            "value": "9969afa7-e1b8-4a0e-b48e-1d381874f533"
+        },
+        "sharedVirtualNetworkName": {
+            "value": "AVirtualNetwork"
+        },
+        "sharedSubnetName": {
+            "value": "ASubnet"
+        },
+        "sharedRouteTableName": {
+            "value": "ARouteTable"
+        },
+        "sharedNetworkSecurityGroupName": {
+            "value": "ANetworkSecurityGroup"
+        },
+        "sharedAppInsightsName": {
+            "value": "AnAppInsightsInstance"
+        },
+        "sharedContainerRegistryName": {
+            "value": "AContainerRegistry"
+        },
+        "sharedRedisInstanceName": {
+            "value": "ASharedRegisInstance"
+        },
+        "sharedAppServicePlanName": {
+            "value": "ASharedAppServicePlan"
+        },
+        "runnerAppServicePlanName": {
+            "value": "ARunnerAppServicePlan"
+        },
+        "runnerSubnetName":{
+            "value": "runnerSubnet"
+        },
+        "sharedLogAnalyticsName": {
+            "value": "ASharedLogAnalyticsAccount"
+        },
+        "documentCaptureSubscriptionKey": {
+            "value": "SomeSubscriptionKey"
+        },
+        "externalSubnetName": {
+            "value": "AnotherSubnet"
+        },
+        "externalLinuxAppServicePlanName": {
+            "value": "ASecondLinuxAppServicePlan"
+        },
+        "externalAppServicePlanSize": {
+            "value": "1"
+        },
+        "externalAppServicePlanInstances": {
+            "value": 1
+        },
+        "externalAppServicePlanTier": {
+            "value": "Standard"
+        },
+        "sqlServerName": {
+            "value": "asqlserver"
+        },
+        "sqlServerAdminUserName": {
+            "value": "aSQLAdmin"
+        },
+        "sqlServerAdminPassword": {
+            "value": "aSecertP@ssword1"
+        },
+        "sqlServerAzureAdAdmin": {
+            "value": "ADAdmin"
+        },
+        "sqlServerAzureAdObjectID": {
+            "value": "dd1951be-18c0-4084-8587-96efd508a07f"
+        },
+        "threatDetectionEmailAddress": {
+            "value": "fundingdevops@education.gov.uk"
+        },
+        "sharedDatabaseName": {
+            "value": "aDatabase"
+        },
+        "sharedDatabaseSku": {
+            "value": "S0"
+        },
+        "sharedDatabaseTier": {
+            "value": "Standard"
+        },
+        "sharedDatabaseMinCapacity": {
+            "value": "1"
+        },
+        "sharedDatabaseAutoPauseDelay": {
+            "value": "-1"
+        },
+        "sharedDatabaseSizeBytes": {
+            "value": "10737418240"
+        },
+        "sharedServiceBusName": {
+            "value": "aServiceBusName"
+        },
+        "sharedLinuxFunctionAppServicePlanName": {
+            "value": "aSharedLinuxFuncsPlan"
+        },
+        "sharedFunctionAppServicePlanSize": {
+            "value": "1"
+        },
+        "sharedFunctionAppServicePlanInstances": {
+            "value": 1
+        },
+        "sharedFunctionAppServicePlanTier":{
+            "value": "Standard"
+        },
+        "funcsSubnetName":{
+            "value": "aFuncsSubnet"
+        }
+    }
+}

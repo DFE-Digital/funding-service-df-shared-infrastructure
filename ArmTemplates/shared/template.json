@@ -1,0 +1,2186 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environmentTag": {
+            "type": "string"
+        },
+        "parentBusinessTag": {
+            "type": "string"
+        },
+        "portfolioTag": {
+            "type": "string"
+        },
+        "productTag": {
+            "type": "string"
+        },
+        "serviceTag": {
+            "type": "string"
+        },
+        "serviceLineTag": {
+            "type": "string"
+        },
+        "serviceOfferingTag": {
+            "type": "string"
+        },
+        "sharedKeyVaultName": {
+            "type": "string",
+            "metadata": {
+                "description": "Resource name for the key vault"
+            }
+        },
+        "accessPolicies": {
+            "type": "object",
+            "defaultValue": {
+                "list": []
+            },
+            "metadata": {
+                "description": "An object containing a list of objects with the following schema: https://docs.microsoft.com/en-us/azure/templates/microsoft.keyvault/2018-02-14/vaults#AccessPolicyEntry"
+            }
+        },
+        "sharedStorageName": {
+            "type": "string",
+            "metadata": {
+                "description": "Resource name of the shared storage account"
+            }
+        },
+        "sharedAuditStorageName" :{
+            "type": "string",
+            "metadata": {
+                "description": "Resource name of the auditing storage account"
+            }
+        },
+        "deploymentServicePrincipalId": {
+            "type": "string",
+            "metadata": {
+                "description": "The GUID of the azure ad user used for the service connection"
+            }
+        },
+        "sharedVirtualNetworkName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name for the deployed virtual network"
+            }
+        },
+        "sharedSubnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the shared subnet"
+            }
+        },
+        "externalSubnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the shared subnet"
+            }
+        },
+        "runnerSubnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Runner subnet"
+            }
+        },
+        "funcsSubnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Funcs subnet"
+            }
+        },
+        "sharedRouteTableName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Name for the subnet on the shared virtual network"
+            }
+        },
+        "sharedNetworkSecurityGroupName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Name for the nsg for subnets on the shared virtual network"
+            }
+        },
+        "sharedAppInsightsName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name for the shared app insights instance"
+            }
+        },
+        "sharedContainerRegistryName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name for the shared container registry"
+            }
+        },
+        "deployContainerRegistry": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "When true, deploy the container registry"
+            }
+        },
+        "sharedRedisInstanceName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the shared redis instance"
+            }
+        },
+        "sharedRedisInstanceSku": {
+            "type": "string",
+            "defaultValue": "Basic",
+            "metadata": {
+                "description": "SKU for the shared redis instance"
+            }
+        },
+        "sharedRedisInstanceCapacity": {
+            "type": "int",
+            "defaultValue": 1,
+            "metadata": {
+                "description": "Capacity of the shared redis instance"
+            }
+        },
+        "sharedRedisInstanceFamily": {
+            "type": "string",
+            "defaultValue": "C",
+            "metadata": {
+                "description": "Family for the shared redis instance"
+            }
+        },
+        "sharedAppServicePlanName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the shared app service plan"
+            }
+        },
+        "sharedAppServicePlanSize": {
+            "type": "string",
+            "defaultValue": "1",
+            "metadata": {
+                "description": "Size of the shared app service plan"
+            }
+        },
+        "sharedAppServicePlanInstances": {
+            "type": "int",
+            "defaultValue": 1,
+            "metadata": {
+                "description": "Number of instances of the shared app service plan to run"
+            }
+        },
+        "sharedAppServicePlanTier": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "metadata": {
+                "description": "The tier of the shared app service plan to run"
+            }
+        },
+        "runnerAppServicePlanName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the runner app service plan"
+            }
+        },
+        "runnerAppServicePlanSize": {
+            "type": "string",
+            "defaultValue": "1",
+            "metadata": {
+                "description": "Size of the runner app service plan"
+            }
+        },
+        "runnerAppServicePlanTier": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "metadata": {
+                "description": "The tier of the runner app service plan to run"
+            }
+        },
+        "RunnerAppServicePlanInstances": {
+            "type": "int",
+            "defaultValue": 1,
+            "metadata": {
+                "description": "Number of instances of the runner app service plan to run"
+            }
+        },
+        "sharedLogAnalyticsName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the shared log analytics account"
+            }
+        },
+        "documentCaptureSubscriptionKey": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The subscription key for this environments Document Capture APIs stored on EAPIM"
+            }
+        },
+        "externalLinuxAppServicePlanName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the resource for the app service plan containing the external api"
+            }
+        },
+        "externalAppServicePlanSize": {
+            "type": "string",
+            "metadata": {
+                "description": "The size of the app service plan containing the external api"
+            }
+        },
+        "externalAppServicePlanInstances": {
+            "type": "int",
+            "metadata": {
+                "description": "The number of instance of the app service plan containing the external api"
+            }
+        },
+        "externalAppServicePlanTier": {
+            "type": "string",
+            "metadata": {
+                "description": "The tier of instance of the app service plan containing the external api"
+            }
+        },
+        "sqlServerName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the sql server for Digital Forms"
+            }
+        },
+        "sqlServerAdminUserName": {
+            "type": "string",
+            "metadata": {
+                "description": "Admin username for sql server"
+            }
+        },
+        "sqlServerAdminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Admin password for sql server"
+            }
+        },
+        "sqlServerAzureAdAdmin": {
+            "type": "string",
+            "metadata": {
+                "description": "Azure AD admin"
+            }
+        },
+        "sqlServerAzureAdObjectId": {
+            "type": "string",
+            "metadata": {
+                "description": "Azure AD admin"
+            }
+        },
+        "threatDetectionEmailAddress": {
+            "type": "string",
+            "metadata": {
+                "description": "Email address for threat detection alerts"
+            }
+        },
+        "enableSqlServerFirewall": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "When true, adds default rules to azure sql firewall"
+            }
+        },
+        "sharedDatabaseName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the shared database"
+            }
+        },
+        "sharedDatabaseSku": {
+            "type": "string",
+            "metadata": {
+                "description": "The SKU to run the database at"
+            }
+        },
+        "sharedDatabaseTier": {
+            "type": "string",
+            "metadata": {
+                "description": "The database tier to select"
+            }
+        },
+        "sharedDatabaseMinCapacity": {
+            "type": "string",
+            "metadata": {
+                "description": "When the SKU is set to GeneralPurpose, this selects the CPU capacity.  For other database SKUs, please supply an empty string!"
+            }
+        },
+        "sharedDatabaseAutoPauseDelay": {
+            "type": "string",
+            "metadata": {
+                "description": "When the SKU is set to GeneralPurpose, this sets the auto-pase delay for the database.  For other database SKUs, please supply -1"
+            }
+        },
+        "sharedDatabaseSizeBytes": {
+            "type": "string",
+            "metadata": {
+                "description": "The max size of the database expressed in bytes"
+            }
+        },
+        "sharedServiceBusName": {
+            "type": "string"
+        },
+        "sharedLinuxFunctionAppServicePlanName": {
+            "type": "string"
+        },
+        "sharedFunctionAppServicePlanSize": {
+            "type": "string"
+        },
+        "sharedFunctionAppServicePlanInstances": {
+            "type": "int"
+        },
+        "sharedFunctionAppServicePlanTier": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "fundingBuildingBlocksUrl": "https://raw.githubusercontent.com/SkillsFundingAgency/funding-platform-building-blocks/main/templates/"
+    },
+    "resources": [
+         {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2024-05-01",
+            "name": "[parameters('sharedNetworkSecurityGroupName')]",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "Environment": "[parameters('environmentTag')]",
+                "Parent Business": "[parameters('parentBusinessTag')]",
+                "Portfolio": "[parameters('portfolioTag')]",
+                "Product": "[parameters('productTag')]",
+                "Service": "[parameters('serviceTag')]",
+                "Service Line": "[parameters('serviceLineTag')]",
+                "Service Offering": "[parameters('serviceOfferingTag')]"
+            },
+            "properties": {
+                "securityRules": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2020-11-01",
+            "name": "[parameters('sharedRouteTableName')]",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "Environment": "[parameters('environmentTag')]",
+                "Parent Business": "[parameters('parentBusinessTag')]",
+                "Portfolio": "[parameters('portfolioTag')]",
+                "Product": "[parameters('productTag')]",
+                "Service": "[parameters('serviceTag')]",
+                "Service Line": "[parameters('serviceLineTag')]",
+                "Service Offering": "[parameters('serviceOfferingTag')]"
+            },
+            "properties": {
+                "disableBgpRoutePropagation": false,
+                "routes": [
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2018-05-01",
+            "name": "sharedVirtualNetwork",
+            "dependsOn": [
+                "[parameters('sharedRouteTableName')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'virtual-network.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceTag": {
+                        "value": "[parameters('serviceTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "serviceOfferingTag": {
+                        "value": "[parameters('serviceOfferingTag')]"
+                    },
+                    "armVnetName": {
+                        "value": "[parameters('sharedVirtualNetworkName')]"
+                    },
+                    "armVnetAddressSpaceCIDR": {
+                        "value": "192.168.0.0/16"
+                    },
+                    "subnetConfiguration": {
+                        "value": [
+                            {
+                                "name": "[parameters('sharedSubnetName')]",
+                                "properties": {
+                                    "addressPrefix": "192.168.0.0/24",
+                                    "serviceEndpoints": [
+                                        {
+                                            "service": "Microsoft.AzureCosmosDB",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        },
+                                        {
+                                            "service": "Microsoft.KeyVault",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        },
+                                        {
+                                            "service": "Microsoft.Storage",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        },
+                                        {
+                                            "service": "Microsoft.Sql",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        },
+                                        {
+                                            "service": "Microsoft.ServiceBus",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        },
+                                        {
+                                            "service": "Microsoft.Web",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        }
+                                    ],
+                                    "delegations": [
+                                        {
+                                            "name": "delegation",
+                                            "properties": {
+                                                "serviceName": "Microsoft.Web/serverfarms"
+                                            }
+                                        }
+                                    ],
+                                    "routeTable": {
+                                        "id": "[resourceId('Microsoft.Network/routeTables', parameters('sharedRouteTableName'))]"
+                                    },
+                                    "networkSecurityGroup": {
+                                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('sharedNetworkSecurityGroupName'))]"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "[parameters('externalSubnetName')]",
+                                "properties": {
+                                    "addressPrefix": "192.168.1.0/24",
+                                    "serviceEndpoints": [
+                                        {
+                                            "service": "Microsoft.AzureCosmosDB",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        },
+                                        {
+                                            "service": "Microsoft.KeyVault",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        },
+                                        {
+                                            "service": "Microsoft.Storage",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        },
+                                        {
+                                            "service": "Microsoft.Sql",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        },
+                                        {
+                                            "service": "Microsoft.ServiceBus",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        },
+                                        {
+                                            "service": "Microsoft.Web",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        }
+                                    ],
+                                    "delegations": [
+                                        {
+                                            "name": "delegation",
+                                            "properties": {
+                                                "serviceName": "Microsoft.Web/serverfarms"
+                                            }
+                                        }
+                                    ],
+                                    "routeTable": {
+                                        "id": "[resourceId('Microsoft.Network/routeTables', parameters('sharedRouteTableName'))]"
+                                    },
+                                    "networkSecurityGroup": {
+                                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('sharedNetworkSecurityGroupName'))]"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "[parameters('runnerSubnetName')]",
+                                "properties": {
+                                    "addressPrefix": "192.168.2.0/24",
+                                    "serviceEndpoints": [
+                                        {
+                                            "service": "Microsoft.AzureCosmosDB",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        },
+                                        {
+                                            "service": "Microsoft.KeyVault",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        },
+                                        {
+                                            "service": "Microsoft.Storage",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        },
+                                        {
+                                            "service": "Microsoft.Sql",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        },
+                                        {
+                                            "service": "Microsoft.ServiceBus",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        },
+                                        {
+                                            "service": "Microsoft.Web",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        }
+                                    ],
+                                    "delegations": [
+                                        {
+                                            "name": "delegation",
+                                            "properties": {
+                                                "serviceName": "Microsoft.Web/serverfarms"
+                                            }
+                                        }
+                                    ],
+                                    "routeTable": {
+                                        "id": "[resourceId('Microsoft.Network/routeTables', parameters('sharedRouteTableName'))]"
+                                    },
+                                    "networkSecurityGroup": {
+                                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('sharedNetworkSecurityGroupName'))]"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "[parameters('funcsSubnetName')]",
+                                "properties": {
+                                    "addressPrefix": "192.168.3.0/24",
+                                    "serviceEndpoints": [
+                                        {
+                                            "service": "Microsoft.AzureCosmosDB",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        },
+                                        {
+                                            "service": "Microsoft.KeyVault",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        },
+                                        {
+                                            "service": "Microsoft.Storage",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        },
+                                        {
+                                            "service": "Microsoft.Sql",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        },
+                                        {
+                                            "service": "Microsoft.ServiceBus",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        },
+                                        {
+                                            "service": "Microsoft.Web",
+                                            "locations": [
+                                                "uksouth"
+                                            ]
+                                        }
+                                    ],
+                                    "delegations": [
+                                        {
+                                            "name": "delegation",
+                                            "properties": {
+                                                "serviceName": "Microsoft.Web/serverfarms"
+                                            }
+                                        }
+                                    ],
+                                    "routeTable": {
+                                        "id": "[resourceId('Microsoft.Network/routeTables', parameters('sharedRouteTableName'))]"
+                                    },
+                                    "networkSecurityGroup": {
+                                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('sharedNetworkSecurityGroupName'))]"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "sharedApplicationInsights",
+            "dependsOn": [
+                "sharedLogAnalytics"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'application-insights-workspace-based.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceTag": {
+                        "value": "[parameters('serviceTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "serviceOfferingTag": {
+                        "value": "[parameters('serviceOfferingTag')]"
+                    },
+                    "appInsightsName": {
+                        "value": "[parameters('sharedAppInsightsName')]"
+                    },
+                    "workspaceId": {
+                        "value": "[resourceId('microsoft.operationalinsights/workspaces', parameters('sharedLogAnalyticsName'))]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "sharedLogAnalytics",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'log-analytics.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceTag": {
+                        "value": "[parameters('serviceTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "serviceOfferingTag": {
+                        "value": "[parameters('serviceOfferingTag')]"
+                    },
+                    "logAnalyticsName": {
+                        "value": "[parameters('sharedLogAnalyticsName')]"
+                    },
+                    "logAnalyticsLocation": {
+                        "value": "UK South"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2018-05-01",
+            "dependsOn": [
+                "sharedVirtualNetwork"
+            ],
+            "name": "sharedStorageAccount",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'storage-account-arm.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceTag": {
+                        "value": "[parameters('serviceTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "serviceOfferingTag": {
+                        "value": "[parameters('serviceOfferingTag')]"
+                    },
+                    "storageAccountName": {
+                        "value": "[parameters('sharedStorageName')]"
+                    },
+                    "storageKind": {
+                        "value": "StorageV2"
+                    },
+                    "enableCors": {
+                        "value": "True"
+                    },
+                    "allowedMethods": {
+                        "value": [ "GET", "POST", "PUT" ]
+                    },
+                    "minimumTlsVersion": {
+                        "value": "TLS1_2"
+                    },
+                    "allowBlobPublicAccess": {
+                        "value": false
+                    },
+                    "subnetResourceIdList": {
+                        "value": [
+                            "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('sharedVirtualNetworkName'), parameters('sharedSubnetName'))]",
+                            "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('sharedVirtualNetworkName'), parameters('runnerSubnetName'))]",
+                            "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('sharedVirtualNetworkName'), parameters('externalSubnetName'))]",
+                            "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('sharedVirtualNetworkName'), parameters('funcsSubnetName'))]"
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-05-01",
+            "name": "sharedStorageAccountConnectionStringShared",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "sharedKeyVault",
+                "sharedStorageAccount"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'keyvault-secret.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "keyVaultName": {
+                        "value": "[parameters('sharedKeyVaultName')]"
+                    },
+                    "secretName": {
+                        "value": "AzureStorageConnectionString"
+                    },
+                    "secretValue": {
+                        "value": "[reference('sharedStorageAccount').outputs.storageConnectionString.value]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-05-01",
+            "name": "sharedKeyVault",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'keyvault.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceTag": {
+                        "value": "[parameters('serviceTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "serviceOfferingTag": {
+                        "value": "[parameters('serviceOfferingTag')]"
+                    },
+                    "keyVaultName": {
+                        "value": "[parameters('sharedKeyVaultName')]"
+                    },
+                    "keyVaultAccessPolicies": {
+                        "value": "[parameters('accessPolicies').list]"
+                    },
+                    "enabledForTemplateDeployment": {
+                        "value": true
+                    },
+                    "enableSoftDelete": {
+                        "value": true
+                    },
+                    "enablePurgeProtection": {
+                        "value": true
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-05-01",
+            "name": "FundingDevopsAccessPolicySharedKeyVault",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "sharedKeyVault"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'keyvault-accesspolicies.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "keyVaultName": {
+                        "value": "[parameters('sharedKeyVaultName')]"
+                    },
+                    "accessPolicies": {
+                        "value": [
+                            {
+                                "tenantId": "fad277c9-c60a-4da1-b5f3-b3b8b34a82f9",
+                                "objectId": "[parameters('deploymentServicePrincipalId')]",
+                                "permissions": {
+                                    "keys": [
+                                        "Get",
+                                        "List"
+                                    ],
+                                    "secrets": [
+                                        "Get",
+                                        "Set",
+                                        "List"
+                                    ],
+                                    "certificates": [
+                                        "Get",
+                                        "List"
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2018-05-01",
+            "name": "sharedAppInsights",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'application-insights.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceTag": {
+                        "value": "[parameters('serviceTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "serviceOfferingTag": {
+                        "value": "[parameters('serviceOfferingTag')]"
+                    },
+                    "appInsightsName": {
+                        "value": "[parameters('sharedAppInsightsName')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "sharedKeyVaultDocCaptureSubscriptionKey",
+            "dependsOn": [
+                "sharedKeyVault"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'keyvault-secret.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "keyVaultName": {
+                        "value": "[parameters('sharedKeyVaultName')]"
+                    },
+                    "secretName": {
+                        "value": "DocCaptureSubscriptionKey"
+                    },
+                    "secretValue": {
+                        "value": "[parameters('documentCaptureSubscriptionKey')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "condition": "[parameters('deployContainerRegistry')]",
+            "apiVersion": "2018-05-01",
+            "name": "sharedRegistry",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'container-registry.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "registryName": {
+                        "value": "[parameters('sharedContainerRegistryName')]"
+                    },
+                    "registrySkuName": {
+                        "value": "Standard"
+                    },
+                    "adminUserEnabled": {
+                        "value": true
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2018-05-01",
+            "name": "sharedRedisInstance",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'redis.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceTag": {
+                        "value": "[parameters('serviceTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "serviceOfferingTag": {
+                        "value": "[parameters('serviceOfferingTag')]"
+                    },
+                    "redisCacheName": {
+                        "value": "[parameters('sharedRedisInstanceName')]"
+                    },
+                    "redisCacheSKU": {
+                        "value": "[parameters('sharedRedisInstanceSku')]"
+                    },
+                    "redisCacheFamily": {
+                        "value": "[parameters('sharedRedisInstanceFamily')]"
+                    },
+                    "redisCacheCapacity": {
+                        "value": "[parameters('sharedRedisInstanceCapacity')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2018-05-01",
+            "name": "sharedAppServicePlan",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'app-service-plan.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceTag": {
+                        "value": "[parameters('serviceTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "serviceOfferingTag": {
+                        "value": "[parameters('serviceOfferingTag')]"
+                    },
+                    "appServicePlanName": {
+                        "value": "[parameters('sharedAppServicePlanName')]"
+                    },
+                    "aspSize": {
+                        "value": "[parameters('sharedAppServicePlanSize')]"
+                    },
+                    "aspLocation": {
+                        "value": "UK South"
+                    },
+                    "aspInstances": {
+                        "value": "[parameters('sharedAppServicePlanInstances')]"
+                    },
+                    "appServicePlanKind": {
+                        "value": "linux"
+                    },
+                    "nonASETier": {
+                        "value": "[parameters('sharedAppServicePlanTier')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2018-05-01",
+            "name": "runnerAppServicePlan",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'app-service-plan.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceTag": {
+                        "value": "[parameters('serviceTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "serviceOfferingTag": {
+                        "value": "[parameters('serviceOfferingTag')]"
+                    },
+                    "appServicePlanName": {
+                        "value": "[parameters('runnerAppServicePlanName')]"
+                    },
+                    "aspSize": {
+                        "value": "[parameters('runnerAppServicePlanSize')]"
+                    },
+                    "aspInstances": {
+                        "value": "[parameters('RunnerAppServicePlanInstances')]"
+                    },
+                    "aspLocation": {
+                        "value": "UK South"
+                    },
+                    "appServicePlanKind": {
+                        "value": "linux"
+                    },
+                    "nonASETier": {
+                        "value": "[parameters('runnerAppServicePlanTier')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "condition": "[greater(parameters('RunnerAppServicePlanInstances'), 1)]",
+            "name": "runnerAppServicePlanAutoscaleOnCPURule",
+            "dependsOn": [
+                "runnerAppServicePlan"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'app-service-plan-autoscale.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "appServicePlanName": {
+                        "value": "[parameters('externalLinuxAppServicePlanName')]"
+                    },
+                    "scalingRuleName": {
+                        "value": "[concat(parameters('externalLinuxAppServicePlanName'), '-CPUScaleRule')]"
+                    },
+                    "defaultCapacity": {
+                        "value": 2
+                    },
+                    "minimumCapacity": {
+                        "value": 2
+                    },
+                    "maximumCapacity": {
+                        "value": 8
+                    },
+                    "scalingRules": {
+                        "value": [
+                            {
+                                "metricTrigger": {
+                                    "metricName": "CPUPercentage",
+                                    "metricNamespace": "",
+                                    "metricResourceUri": "[resourceId('Microsoft.Web/serverfarms', parameters('runnerAppServicePlanName'))]",
+                                    "timeGrain": "PT5M",
+                                    "statistic": "Average",
+                                    "timeWindow": "PT10M",
+                                    "timeAggregation": "Average",
+                                    "operator": "GreaterThan",
+                                    "threshold": "60"
+                                },
+                                "scaleAction": {
+                                    "direction": "Increase",
+                                    "type": "ChangeCount",
+                                    "value": "1",
+                                    "cooldown": "PT10M"
+                                }
+                            },
+                            {
+                                "metricTrigger": {
+                                    "metricName": "CPUPercentage",
+                                    "metricNamespace": "",
+                                    "metricResourceUri": "[resourceId('Microsoft.Web/serverfarms', parameters('runnerAppServicePlanName'))]",
+                                    "timeGrain": "PT5M",
+                                    "statistic": "Average",
+                                    "timeWindow": "PT10M",
+                                    "timeAggregation": "Average",
+                                    "operator": "LessThan",
+                                    "threshold": "50"
+                                },
+                                "scaleAction": {
+                                    "direction": "Decrease",
+                                    "type": "ChangeCount",
+                                    "value": "1",
+                                    "cooldown": "PT10M"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2018-05-01",
+            "name": "externalLinuxAppServicePlan",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'app-service-plan.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceTag": {
+                        "value": "[parameters('serviceTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "serviceOfferingTag": {
+                        "value": "[parameters('serviceOfferingTag')]"
+                    },
+                    "appServicePlanName": {
+                        "value": "[parameters('externalLinuxAppServicePlanName')]"
+                    },
+                    "appServicePlanKind": {
+                        "value": "linux"
+                    },
+                    "aspSize": {
+                        "value": "[parameters('externalAppServicePlanSize')]"
+                    },
+                    "aspLocation": {
+                        "value": "UK South"
+                    },
+                    "aspInstances": {
+                        "value": "[parameters('externalAppServicePlanInstances')]"
+                    },
+                    "nonASETier": {
+                        "value": "[parameters('externalAppServicePlanTier')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "name": "externalAppServicePlanAutoscaleOnCPURule",
+            "dependsOn": [
+                "externalLinuxAppServicePlan"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'app-service-plan-autoscale.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "appServicePlanName": {
+                        "value": "[parameters('externalLinuxAppServicePlanName')]"
+                    },
+                    "scalingRuleName": {
+                        "value": "[concat(parameters('externalLinuxAppServicePlanName'), '-CPUScaleRule')]"
+                    },
+                    "defaultCapacity": {
+                        "value": 2
+                    },
+                    "minimumCapacity": {
+                        "value": 2
+                    },
+                    "maximumCapacity": {
+                        "value": 8
+                    },
+                    "scalingRules": {
+                        "value": [
+                            {
+                                "metricTrigger": {
+                                    "metricName": "CPUPercentage",
+                                    "metricNamespace": "",
+                                    "metricResourceUri": "[resourceId('Microsoft.Web/serverfarms', parameters('externalLinuxAppServicePlanName'))]",
+                                    "timeGrain": "PT5M",
+                                    "statistic": "Average",
+                                    "timeWindow": "PT10M",
+                                    "timeAggregation": "Average",
+                                    "operator": "GreaterThan",
+                                    "threshold": "75"
+                                },
+                                "scaleAction": {
+                                    "direction": "Increase",
+                                    "type": "ChangeCount",
+                                    "value": "1",
+                                    "cooldown": "PT10M"
+                                }
+                            },
+                            {
+                                "metricTrigger": {
+                                    "metricName": "CPUPercentage",
+                                    "metricNamespace": "",
+                                    "metricResourceUri": "[resourceId('Microsoft.Web/serverfarms', parameters('externalLinuxAppServicePlanName'))]",
+                                    "timeGrain": "PT5M",
+                                    "statistic": "Average",
+                                    "timeWindow": "PT10M",
+                                    "timeAggregation": "Average",
+                                    "operator": "LessThan",
+                                    "threshold": "65"
+                                },
+                                "scaleAction": {
+                                    "direction": "Decrease",
+                                    "type": "ChangeCount",
+                                    "value": "1",
+                                    "cooldown": "PT10M"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-05-01",
+            "name": "sharedLinuxFunctionAppServicePlan",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'app-service-plan.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceTag": {
+                        "value": "[parameters('serviceTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "serviceOfferingTag": {
+                        "value": "[parameters('serviceOfferingTag')]"
+                    },
+                    "appServicePlanName": {
+                        "value": "[parameters('sharedLinuxFunctionAppServicePlanName')]"
+                    },
+                    "appServicePlanKind": {
+                        "value": "linux"
+                    },
+                    "aspLocation": {
+                        "value": "UK South"
+                    },
+                    "aspSize": {
+                        "value": "[parameters('sharedFunctionAppServicePlanSize')]"
+                    },
+                    "aspInstances": {
+                        "value": "[parameters('sharedFunctionAppServicePlanInstances')]"
+                    },
+                    "nonASETier": {
+                        "value": "[parameters('sharedFunctionAppServicePlanTier')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "datasetsContainerOnSharedStorage",
+            "dependsOn": [
+                "sharedStorageAccount"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'storage-container.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "storageAccountName": {
+                        "value": "[parameters('sharedStorageName')]"
+                    },
+                    "containerName": {
+                        "value": "df-datasets"
+                    },
+                    "publicAccess": {
+                        "value": "None"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2018-05-01",
+            "name": "sharedAuditStorageAccount",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'storage-account-arm.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceTag": {
+                        "value": "[parameters('serviceTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "serviceOfferingTag": {
+                        "value": "[parameters('serviceOfferingTag')]"
+                    },
+                    "storageAccountName": {
+                        "value": "[parameters('sharedAuditStorageName')]"
+                    },
+                    "enableCors": {
+                        "value": "True"
+                    },
+                    "allowedMethods": {
+                        "value": [ "GET", "POST", "PUT" ]
+                    },
+                    "minimumTlsVersion": {
+                        "value": "TLS1_2"
+                    },
+                    "allowBlobPublicAccess": {
+                        "value": false
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "name": "sharedSqlServer",
+            "dependsOn": [
+                "sharedAuditStorageAccount"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'sql-server.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceTag": {
+                        "value": "[parameters('serviceTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "serviceOfferingTag": {
+                        "value": "[parameters('serviceOfferingTag')]"
+                    },
+                    "sqlServerName": {
+                        "value": "[parameters('sqlServerName')]"
+                    },
+                    "sqlServerLocation": {
+                        "value": "[resourceGroup().location]"
+                    },
+                    "sqlServerAdminUserName": {
+                        "value": "[parameters('sqlServerAdminUserName')]"
+                    },
+                    "sqlServerAdminPassword": {
+                        "value": "[parameters('sqlServerAdminPassword')]"
+                    },
+                    "threatDetectionEmailAddress": {
+                        "value": "[parameters('threatDetectionEmailAddress')]"
+                    },
+                    "sqlServerActiveDirectoryAdminLogin": {
+                        "value": "[parameters('sqlServerAzureAdAdmin')]"
+                    },
+                    "sqlServerActiveDirectoryAdminObjectId": {
+                        "value": "[parameters('sqlServerAzureAdObjectId')]"
+                    },
+                    "sqlServerminimalTlsVersion": {
+                        "value": "1.2"
+                    },
+                    "sqlStorageAccountName": {
+                        "value": "[parameters('sharedAuditStorageName')]"
+                    }
+                }
+            }
+        },
+        {
+          "type": "microsoft.sql/servers/databases/providers/diagnosticSettings",
+          "name": "[concat(parameters('sqlServerName'), '/master/microsoft.insights/SQLSecurityAuditEvents')]",
+          "apiVersion": "2017-05-01-preview",
+          "properties": {
+            "name": "SqlSecurityAuditEvents",
+            "workspaceId": "[resourceId(resourceGroup().name, 'Microsoft.OperationalInsights/workspaces', parameters('sharedLogAnalyticsName'))]",
+            "logs": [
+              {
+                "category": "SQLSecurityAuditEvents",
+                "enabled": true,
+                "retentionPolicy": {
+                  "days": 0,
+                  "enabled": true
+                }
+              }
+            ]
+          },
+          "dependsOn": [
+            "sharedSqlServer"
+          ]
+        },
+        {
+            "type": "Microsoft.Sql/servers/virtualNetworkRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('sqlServerName'), '/', parameters('sharedSubnetName'))]",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "virtualNetworkSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('sharedVirtualNetworkName'), parameters('sharedSubnetName'))]",
+                "ignoreMissingVnetServiceEndpoint": false
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/virtualNetworkRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('sqlServerName'), '/', parameters('runnerSubnetName'))]",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "virtualNetworkSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('sharedVirtualNetworkName'), parameters('runnerSubnetName'))]",
+                "ignoreMissingVnetServiceEndpoint": false
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/virtualNetworkRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('sqlServerName'), '/', parameters('externalSubnetName'))]",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "virtualNetworkSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('sharedVirtualNetworkName'), parameters('externalSubnetName'))]",
+                "ignoreMissingVnetServiceEndpoint": false
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/virtualNetworkRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('sqlServerName'), '/', parameters('funcsSubnetName'))]",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "virtualNetworkSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('sharedVirtualNetworkName'), parameters('funcsSubnetName'))]",
+                "ignoreMissingVnetServiceEndpoint": false
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "name": "sharedSqlConnPolicy",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'sql-server-conn-policy.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "sqlServerName": {
+                        "value": "[parameters('sqlServerName')]"
+                    },
+                    "sqlServerLocation": {
+                        "value": "[resourceGroup().location]"
+                    },
+                    "connectionType": {
+                        "value": "Proxy"
+                    }
+                }
+            }
+        },
+        {
+            "condition": "[parameters('enableSqlServerFirewall')]",
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('sqlServerName'), '/DfE London')]",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "startIpAddress": "217.38.175.0",
+                "endIpAddress": "217.38.175.255"
+            }
+        },
+        {
+            "condition": "[parameters('enableSqlServerFirewall')]",
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('sqlServerName'), '/DfE Sheffield')]",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "startIpAddress": "217.38.165.0",
+                "endIpAddress": "217.38.165.255"
+            }
+        },
+        {
+            "condition": "[parameters('enableSqlServerFirewall')]",
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('sqlServerName'), '/DfE London Proxy')]",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "startIpAddress": "213.123.63.150",
+                "endIpAddress": "213.123.63.150"
+            }
+        },
+        {
+            "condition": "[parameters('enableSqlServerFirewall')]",
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('sqlServerName'), '/DfE Sheffield Proxy Old')]",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "startIpAddress": "86.188.174.157",
+                "endIpAddress": "86.188.174.157"
+            }
+        },
+        {
+            "condition": "[parameters('enableSqlServerFirewall')]",
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('sqlServerName'), '/DfE Sheffield Proxy New')]",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "startIpAddress": "194.72.231.130",
+                "endIpAddress": "194.72.231.133"
+            }
+        },
+        {
+            "condition": "[parameters('enableSqlServerFirewall')]",
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('sqlServerName'), '/DfE Coventry NAT')]",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "startIpAddress": "81.134.140.20",
+                "endIpAddress": "81.134.140.28"
+            }
+        },
+        {
+            "condition": "[parameters('enableSqlServerFirewall')]",
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('sqlServerName'), '/DfE NewCastle Proxy')]",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "startIpAddress": "31.121.65.89",
+                "endIpAddress": "31.121.65.94"
+            }
+        },
+        {
+            "condition": "[not(parameters('enableSqlServerFirewall'))]",
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('sqlServerName'), '/AllowAll')]",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "startIpAddress": "0.0.0.0",
+                "endIpAddress": "255.255.255.255"
+            }
+        },
+        {
+            "condition": "[parameters('enableSqlServerFirewall')]",
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('sqlServerName'), '/', parameters('sharedSubnetName'))]",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "startIpAddress": "192.168.0.0",
+                "endIpAddress": "192.168.0.255"
+            }
+        },
+        {
+            "condition": "[parameters('enableSqlServerFirewall')]",
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('sqlServerName'), '/', parameters('runnerSubnetName'))]",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "startIpAddress": "192.168.2.0",
+                "endIpAddress": "192.168.2.255"
+            }
+        },
+        {
+            "condition": "[parameters('enableSqlServerFirewall')]",
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('sqlServerName'), '/', parameters('externalSubnetName'))]",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "startIpAddress": "192.168.1.0",
+                "endIpAddress": "192.168.1.255"
+            }
+        },
+        {
+            "condition": "[parameters('enableSqlServerFirewall')]",
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('sqlServerName'), '/', parameters('funcsSubnetName'))]",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "startIpAddress": "192.168.3.0",
+                "endIpAddress": "192.168.3.255"
+            }
+        },
+        {
+            "condition": "[parameters('enableSqlServerFirewall')]",
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('sqlServerName'), '/GlobalProtectVPNRange1')]",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "startIpAddress": "208.127.46.232",
+                "endIpAddress": "208.127.46.238"
+            }
+        },
+        {
+            "condition": "[parameters('enableSqlServerFirewall')]",
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('sqlServerName'), '/GlobalProtectVPNRange2')]",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "startIpAddress": "208.127.46.240",
+                "endIpAddress": "208.127.46.255"
+            }
+        },
+        {
+            "condition": "[parameters('enableSqlServerFirewall')]",
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('sqlServerName'), '/Prisma Access 2')]",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "startIpAddress": "208.127.45.248",
+                "endIpAddress": "208.127.45.248"
+            }
+        },
+        {
+            "condition": "[parameters('enableSqlServerFirewall')]",
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('sqlServerName'), '/Prisma Access 5')]",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "startIpAddress": "208.127.50.230",
+                "endIpAddress": "208.127.50.230"
+            }
+        },
+        {
+            "condition": "[parameters('enableSqlServerFirewall')]",
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('sqlServerName'), '/Prisma Access 6')]",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "startIpAddress": "208.127.52.236",
+                "endIpAddress": "208.127.52.236"
+            }
+        },
+        {
+            "condition": "[parameters('enableSqlServerFirewall')]",
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('sqlServerName'), '/Prisma Access 8')]",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "startIpAddress": "208.127.53.148",
+                "endIpAddress": "208.127.53.148"
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "name": "sharedDatabase",
+            "dependsOn": [
+                "sharedSqlServer"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'sql-database.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceTag": {
+                        "value": "[parameters('serviceTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "serviceOfferingTag": {
+                        "value": "[parameters('serviceOfferingTag')]"
+                    },
+                    "sqlServerName": {
+                        "value": "[parameters('sqlServerName')]"
+                    },
+                    "databaseName": {
+                        "value": "[parameters('sharedDatabaseName')]"
+                    },
+                    "logAnalyticsResourceGroup": {
+                        "value": "[resourceGroup().name]"
+                    },
+                    "logAnalyticsWorkspaceName": {
+                        "value": "[parameters('sharedLogAnalyticsName')]"
+                    },
+                    "databaseSkuName": {
+                        "value": "[parameters('sharedDatabaseSku')]"
+                    },
+                    "databaseTier": {
+                        "value": "[parameters('sharedDatabaseTier')]"
+                    },
+                    "databaseSizeBytes": {
+                        "value": "[parameters('sharedDatabaseSizeBytes')]"
+                    },
+                    "serverlessMinCapacity": {
+                        "value": "[parameters('sharedDatabaseMinCapacity')]"
+                    },
+                    "serverlessAutoPauseDelay": {
+                        "value": "[parameters('sharedDatabaseAutoPauseDelay')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-05-01",
+            "name": "SecretSqlServerAdminUsername",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "sharedKeyVault"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'keyvault-secret.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "keyVaultName": {
+                        "value": "[parameters('sharedKeyVaultName')]"
+                    },
+                    "secretName": {
+                        "value": "SqlServerAdminUsername"
+                    },
+                    "secretValue": {
+                        "value": "[parameters('sqlServerAdminUserName')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-05-01",
+            "name": "SecretSqlServerAdminPassword",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "sharedKeyVault"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'keyvault-secret.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "keyVaultName": {
+                        "value": "[parameters('sharedKeyVaultName')]"
+                    },
+                    "secretName": {
+                        "value": "SqlServerAdminPassword"
+                    },
+                    "secretValue": {
+                        "value": "[parameters('sqlServerAdminPassword')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-05-01",
+            "name": "SecretSqlServerConnectionString",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "sharedKeyVault"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'keyvault-secret.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "keyVaultName": {
+                        "value": "[parameters('sharedKeyVaultName')]"
+                    },
+                    "secretName": {
+                        "value": "SharedDatabaseConnectionString"
+                    },
+                    "secretValue": {
+                        "value": "[concat('Server=tcp:', parameters('sqlServerName'), '.database.windows.net,1433;Database=', parameters('sharedDatabaseName'), ';Authentication=Active Directory Managed Identity;Command Timeout=60')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "sharedServiceBus",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'service-bus.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceTag": {
+                        "value": "[parameters('serviceTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "serviceOfferingTag": {
+                        "value": "[parameters('serviceOfferingTag')]"
+                    },
+                    "serviceBusNamespaceName": {
+                        "value": "[parameters('sharedServiceBusName')]"
+                    },
+                    "serviceBusSku": {
+                        "value": "Standard"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-05-01",
+            "name": "secretSharedServiceBus",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "sharedKeyVault",
+                "sharedServiceBus"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'keyvault-secret.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "keyVaultName": {
+                        "value": "[parameters('sharedKeyVaultName')]"
+                    },
+                    "secretName": {
+                        "value": "ServiceBusConnectionString"
+                    },
+                    "secretValue": {
+                        "value": "[reference('sharedServiceBus').outputs.ServiceBusEndpoint.value]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "dfsubmissions-dataqQueue",
+            "dependsOn": [
+              "sharedServiceBus"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'service-bus-queue.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "serviceBusNamespaceName": {
+                        "value": "[parameters('sharedServiceBusName')]"
+                    },
+                    "queueName": {
+                        "value": "dfsubmissions-dataq"
+                    },
+                    "MessageLockDuration": {
+                        "value": "PT1M"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "dfsubmissions-pdfprintqQueue",
+            "dependsOn": [
+              "sharedServiceBus"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'service-bus-queue.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "serviceBusNamespaceName": {
+                        "value": "[parameters('sharedServiceBusName')]"
+                    },
+                    "queueName": {
+                        "value": "dfsubmissions-pdfprintq"
+                    },
+                    "MessageLockDuration": {
+                        "value": "PT1M"
+                    }
+                }
+            }
+        }
+    ]
+}

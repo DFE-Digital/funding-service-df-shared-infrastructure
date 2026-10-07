@@ -1,0 +1,96 @@
+{
+    "Source": "Cosmos-nosql",
+    "Sink": "Json-AzureBlob",
+    "Operations": [{
+            //Cosmos settings
+            "SourceSettings": {
+                "Database": "df-forms",
+                "Container": "forms",
+                "ConnectionString": "",
+                "IncludeMetadataFields": true,
+                "Query": "SELECT * FROM c "
+            },
+            //Azure blog storage account settings
+            "SinkSettings": {
+                "ContainerName": "cosmosdata-backup",
+                "ConnectionString": "",
+                "BlobName": "forms.json"
+            }
+        }, {
+            //Cosmos settings
+            "SourceSettings": {
+                "Database": "df-forms",
+                "Container": "providers-mapping",
+                "ConnectionString": "",
+                "IncludeMetadataFields": true,
+                "Query": "SELECT * FROM c "
+            },
+            //Azure blog storage account settings
+            "SinkSettings": {
+                "ContainerName": "cosmosdata-backup",
+                "ConnectionString": "",
+                "BlobName": "providers-mapping.json"
+            }
+        }, {
+            //Cosmos settings
+            "SourceSettings": {
+                "Database": "df-forms",
+                "Container": "responses",
+                "ConnectionString": "",
+                "IncludeMetadataFields": true,
+                "Query": "SELECT * FROM c "
+            },
+            //Azure blog storage account settings
+            "SinkSettings": {
+                "ContainerName": "cosmosdata-backup",
+                "ConnectionString": "",
+                "BlobName": "responses.json"
+            }
+        }, {
+            //Cosmos settings
+            "SourceSettings": {
+                "Database": "df-forms",
+                "Container": "responses_uat",
+                "ConnectionString": "",
+                "IncludeMetadataFields": true,
+                "Query": "SELECT * FROM c "
+            },
+            //Azure blog storage account settings
+            "SinkSettings": {
+                "ContainerName": "cosmosdata-backup",
+                "ConnectionString": "",
+                "BlobName": "responses_uat.json"
+            }
+        }, {
+            //Cosmos settings
+            "SourceSettings": {
+                "Database": "df-forms",
+                "Container": "RunnerDraftData",
+                "ConnectionString": "",
+                "IncludeMetadataFields": true,
+                "Query": "SELECT * FROM c "
+            },
+            //Azure blog storage account settings
+            "SinkSettings": {
+                "ContainerName": "cosmosdata-backup",
+                "ConnectionString": "",
+                "BlobName": "RunnerDraftData.json"
+            }
+        }, {
+            //Cosmos settings
+            "SourceSettings": {
+                "Database": "df-forms",
+                "Container": "SubmissionAuditLog",
+                "ConnectionString": "",
+                "IncludeMetadataFields": true,
+                "Query": "SELECT * FROM c "
+            },
+            //Azure blog storage account settings
+            "SinkSettings": {
+                "ContainerName": "cosmosdata-backup",
+                "ConnectionString": "",
+                "BlobName": "SubmissionAuditLog.json"
+            }
+        }
+    ]
+}

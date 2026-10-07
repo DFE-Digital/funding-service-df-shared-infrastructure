@@ -1,0 +1,217 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environmentTag": {
+            "type": "string"
+        },
+        "portfolioTag": {
+            "type": "string"
+        },
+        "serviceLineTag": {
+            "type": "string"
+        },
+        "serviceTag": {
+            "type": "string"
+        },
+        "productTag": {
+            "type": "string"
+        },
+        "serviceOfferingTag": {
+            "type": "string"
+        },
+        "parentBusinessTag": {
+            "type": "string"
+        },
+        "sharedAppServicePlanName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the shared app service plan used to host web apps"
+            }
+        },
+        "sharedRedisCacheName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the shared redis cache"
+            }
+        },
+        "sharedKeyVaultName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the shared key vault"
+            }
+        },
+        "sharedStorageAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the shared storage account"
+            }
+        },
+        "sharedActionGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the shared alerting action group"
+            }
+        }
+    },
+    "variables": {
+        "fundingBuildingBlocksUrl": "https://raw.githubusercontent.com/SkillsFundingAgency/funding-platform-building-blocks/main/templates/",
+        "sharedAlertRules": [
+            {
+                "MetricName": "CpuPercentage",
+                "Operator": "GreaterThanOrEqual",
+                "Threshold": "75",
+                "Aggregation": "Average",
+                "ResourceType": "Microsoft.Web/serverfarms",
+                "ResourceName": "[parameters('sharedAppServicePlanName')]",
+                "WindowSize": "PT15M"
+            },
+            {
+                "MetricName": "MemoryPercentage",
+                "Operator": "GreaterThanOrEqual",
+                "Threshold": "75",
+                "Aggregation": "Average",
+                "ResourceType": "Microsoft.Web/serverfarms",
+                "ResourceName": "[parameters('sharedAppServicePlanName')]",
+                "WindowSize": "PT15M"
+            },
+            {
+                "MetricName": "DiskQueueLength",
+                "Operator": "GreaterThan",
+                "Threshold": "75",
+                "Aggregation": "Average",
+                "ResourceType": "Microsoft.Web/serverfarms",
+                "ResourceName": "[parameters('sharedAppServicePlanName')]",
+                "WindowSize": "PT15M"
+            },
+            {
+                "MetricName": "TcpEstablished",
+                "Operator": "GreaterThanOrEqual",
+                "Threshold": "1250",
+                "Aggregation": "Average",
+                "ResourceType": "Microsoft.Web/serverfarms",
+                "ResourceName": "[parameters('sharedAppServicePlanName')]",
+                "WindowSize": "PT5M"
+            },
+            {
+                "MetricName": "Errors",
+                "Operator": "GreaterThan",
+                "Threshold": "0",
+                "Aggregation": "Maximum",
+                "ResourceType": "Microsoft.Cache/Redis",
+                "ResourceName": "[parameters('sharedRedisCacheName')]",
+                "WindowSize": "PT5M"
+            },
+            {
+                "MetricName": "ServerLoad",
+                "Operator": "GreaterThanOrEqual",
+                "Threshold": "75",
+                "Aggregation": "Maximum",
+                "ResourceType": "Microsoft.Cache/Redis",
+                "ResourceName": "[parameters('sharedRedisCacheName')]",
+                "WindowSize": "PT5M"
+            },
+            {
+                "MetricName": "UsedMemoryPercentage",
+                "Operator": "GreaterThanOrEqual",
+                "Threshold": "75",
+                "Aggregation": "Maximum",
+                "ResourceType": "Microsoft.Cache/Redis",
+                "ResourceName": "[parameters('sharedRedisCacheName')]",
+                "WindowSize": "PT5M"
+            },
+            {
+                "MetricName": "percentProcessorTime",
+                "Operator": "GreaterThanOrEqual",
+                "Threshold": "75",
+                "Aggregation": "Maximum",
+                "ResourceType": "Microsoft.Cache/Redis",
+                "ResourceName": "[parameters('sharedRedisCacheName')]",
+                "WindowSize": "PT5M"
+            },
+            {
+                "MetricName": "Availability",
+                "Operator": "LessThan",
+                "Threshold": "100",
+                "Aggregation": "Average",
+                "ResourceType": "Microsoft.KeyVault/vaults",
+                "ResourceName": "[parameters('sharedKeyVaultName')]",
+                "WindowSize": "PT5M"
+            },
+            {
+                "MetricName": "Availability",
+                "Operator": "LessThan",
+                "Threshold": "100",
+                "Aggregation": "Average",
+                "ResourceType": "Microsoft.Storage/storageAccounts",
+                "ResourceName": "[parameters('sharedStorageAccountName')]",
+                "WindowSize": "PT5M"
+            }
+        ]
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "name": "[concat(variables('sharedAlertRules')[copyIndex()].ResourceName, '-', replace(variables('sharedAlertRules')[copyIndex()].MetricName, '/', '-'))]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'alert-rules.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceTag": {
+                        "value": "[parameters('serviceTag')]"
+                    },
+                    "serviceOfferingTag": {
+                        "value": "[parameters('serviceOfferingTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "alertName": {
+                        "value": "[concat(variables('sharedAlertRules')[copyIndex()].ResourceName, '-metric-', replace(variables('sharedAlertRules')[copyIndex()].MetricName, '/', '-'))]"
+                    },
+                    "metricName": {
+                        "value": "[variables('sharedAlertRules')[copyIndex()].MetricName]"
+                    },
+                    "operator": {
+                        "value": "[variables('sharedAlertRules')[copyIndex()].Operator]"
+                    },
+                    "threshold": {
+                        "value": "[variables('sharedAlertRules')[copyIndex()].Threshold]"
+                    },
+                    "aggregation": {
+                        "value": "[variables('sharedAlertRules')[copyIndex()].Aggregation]"
+                    },
+                    "actionGroupName": {
+                        "value": "[parameters('sharedActionGroupName')]"
+                    },
+                    "windowSize": {
+                        "value": "[variables('sharedAlertRules')[copyIndex()].WindowSize]"
+                    },
+                    "resourceId": {
+                        "value": "[resourceId(variables('sharedAlertRules')[copyIndex()].ResourceType, variables('sharedAlertRules')[copyIndex()].ResourceName)]"
+                    }
+                }
+            },
+            "copy": {
+                "name": "AlertRulesCopy",
+                "count": "[length(variables('sharedAlertRules'))]"
+            }
+        }
+    ]
+}

@@ -1,0 +1,32 @@
+﻿variables:
+  ResourcePrefix: s255t01
+  AzureSubscription: 'c4542a65-affe-40bb-a9c0-33fc31feb3c9'
+  DeploymentServicePrincipal: 'e35197b9-684d-4b77-9b90-2d792b6d5e42'
+  DeploySharedContainerRegistry: false
+  FormsCollectionThroughput: 30000
+  NodeEnvironmentAppSetting: test
+  SharedAppServicePlanInstances: 1
+  SharedAppServicePlanSize: 3
+  SharedAppServicePlanTier: PremiumV2
+  SharedFunctionAppServicePlanInstances: 1
+  SharedFunctionAppServicePlanSize: 2
+  SharedFunctionAppServicePlanTier: PremiumV2
+  SharedRedisInstanceCount: 1
+  SharedRedisInstanceFamily: C
+  SharedRedisInstanceSku: Basic
+  RunnerAppServicePlanInstances: 1
+  RunnerAppServicePlanSize: 3
+  RunnerAppServicePlanTier: PremiumV2
+
+  # External API app service config
+  ExternalAppServicePlanInstances: 2
+  ExternalAppServicePlanSize: 2
+  ExternalAppServicePlanTier: PremiumV2
+
+  # Tags
+  EnvironmentTag: Test
+
+  # Shared Database
+  SharedDatabaseSku: P1
+  SharedDatabaseTier: Premium
+  SharedDatabaseSizeBytes: 10737418240

@@ -1,0 +1,85 @@
+﻿parameters:
+- name: AzureServiceConnection
+  type: string
+- name: Environment
+  type: string
+
+jobs:
+- deployment: DeployTo${{ parameters.Environment }}
+  displayName: "Deploy To ${{ parameters.Environment }}"
+  environment: Digital Forms - ${{ parameters.Environment }}
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - task: AzurePowerShell@5
+          displayName: 'Register resource provider'
+          inputs:
+            azureSubscription: '${{ parameters.AzureServiceConnection }}'
+            ScriptType: InlineScript
+            Inline: |
+              Register-AzResourceProvider -ProviderNamespace Microsoft.AlertsManagement
+            azurePowerShellVersion: LatestVersion
+            pwsh: true
+
+        - task: AzurePowerShell@5
+          displayName: 'Get existing access policies from shared KeyVault'
+          inputs:
+            azureSubscription: '${{ parameters.AzureServiceConnection }}'
+            ScriptPath: '$(Pipeline.Workspace)/DigitalForms.Scripts/GetKeyVaultAccessPolicies.ps1'
+            ScriptArguments: '-keyVaultName "$(SharedKeyVaultName)"'
+            azurePowerShellVersion: LatestVersion
+            pwsh: true
+
+        - task: AzureResourceManagerTemplateDeployment@3
+          displayName: 'Create resource groups'
+          inputs:
+            deploymentScope: Subscription
+            azureResourceManagerConnection: '${{ parameters.AzureServiceConnection }}'
+            subscriptionId: '$(AzureSubscription)'
+            location: 'UK South'
+            csmFile: '$(Pipeline.Workspace)/DigitalForms.ArmTemplates.Shared/resource-groups/template.json'
+            overrideParameters: '-environmentTag "$(variables.EnvironmentTag)" -parentBusinessTag "$(ParentBusinessTag)" -portfolioTag "$(PortfolioTag)" -productTag "$(ProductTag)" -serviceLineTag "$(ServiceLineTag)"  -serviceTag "$(ServiceTag)" -serviceOfferingTag "$(ServiceOfferingTag)" -sharedResourceGroupName "$(SharedResourceGroupName)" -appServiceResourceGroupName "$(AppServiceResourceGroupName)" -alertingResourceGroupName "$(AlertingResourceGroupName)"'
+            deploymentName: 'df-resource-groups'
+
+        - task: AzureResourceManagerTemplateDeployment@3
+          displayName: 'Deploy shared resources'
+          inputs:
+            azureResourceManagerConnection: '${{ parameters.AzureServiceConnection }}'
+            subscriptionId: '$(AzureSubscription)'
+            resourceGroupName: '$(SharedResourceGroupName)'
+            location: 'UK South'
+            csmFile: '$(Pipeline.Workspace)/DigitalForms.ArmTemplates.Shared/shared/template.json'
+            deploymentName: 'df-shared-infrastructure'
+            overrideParameters: '-environmentTag "$(EnvironmentTag)" -parentBusinessTag "$(ParentBusinessTag)" -portfolioTag "$(PortfolioTag)" -productTag "$(ProductTag)" -serviceLineTag "$(ServiceLineTag)" -serviceTag "$(ServiceTag)" -serviceOfferingTag "$(ServiceOfferingTag)" -sharedKeyVaultName "$(SharedKeyVaultName)" -accessPolicies $(Infra.KeyVault.AccessPolicies) -sharedStorageName "$(SharedStorageName)" -sharedAuditStorageName "$(SharedAuditStorageName)" -deploymentServicePrincipalId "$(DeploymentServicePrincipal)" -sharedVirtualNetworkName "$(SharedVirtualNetworkName)" -sharedSubnetName "$(SharedSubnetName)" -runnerSubnetName "$(RunnerSubnetName)" -sharedRouteTableName "$(SharedRouteTableName)" -sharedNetworkSecurityGroupName "$(SharedNetworkSecurityGroupName)" -sharedAppInsightsName "$(SharedAppInsightsName)"  -sharedContainerRegistryName "$(SharedContainerRegistryName)" -deployContainerRegistry "$(DeploySharedContainerRegistry)" -sharedRedisInstanceName "$(SharedRedisInstanceName)" -sharedRedisInstanceSku "$(SharedRedisInstanceSku)" -sharedRedisInstanceCapacity "$(SharedRedisInstanceCount)" -sharedRedisInstanceFamily "$(SharedRedisInstanceFamily)" -sharedAppServicePlanName "$(SharedAppServicePlanName)" -sharedAppServicePlanSize "$(SharedAppServicePlanSize)" -sharedAppServicePlanInstances "$(SharedAppServicePlanInstances)" -sharedAppServicePlanTier "$(SharedAppServicePlanTier)" -sharedLogAnalyticsName "$(SharedLogAnalyticsName)"  -documentCaptureSubscriptionKey "$(DocCaptureSubscriptionKey)" -externalSubnetName "$(ExternalSubnetName)" -externalLinuxAppServicePlanName "$(ExternalLinuxAppServicePlanName)" -externalAppServicePlanSize "$(ExternalAppServicePlanSize)" -externalAppServicePlanInstances "$(ExternalAppServicePlanInstances)" -externalAppServicePlanTier "$(ExternalAppServicePlanTier)"  -sharedLogAnalyticsName "$(SharedLogAnalyticsName)" -sqlServerName "$(SharedSqlServerName)" -sqlServerAdminUserName "$(SharedSqlAdminUserName)" -sqlServerAdminPassword "$(sqlServerAdminPassword)" -sqlServerAzureAdAdmin "$(SharedSqlAzureAdAdmin)" -sqlServerAzureAdObjectId "$(SharedSqlAzureAdObjectId)" -threatDetectionEmailAddress "$(SharedSqlThreatDetectionEmailAddress)" -enableSqlServerFirewall "$(SharedSqlServerEnableFirewall)" -sharedDatabaseName "$(SharedSqlDatabaseName)" -sharedDatabaseSku "$(SharedDatabaseSku)" -sharedDatabaseTier "$(SharedDatabaseTier)" -sharedDatabaseMinCapacity "" -sharedDatabaseAutoPauseDelay "" -sharedDatabaseSizeBytes "$(SharedDatabaseSizeBytes)" -sharedServiceBusName "$(sharedServiceBusName)" -sharedLinuxFunctionAppServicePlanName "$(sharedLinuxFunctionAppServicePlanName)" -sharedFunctionAppServicePlanSize "$(sharedFunctionAppServicePlanSize)" -sharedFunctionAppServicePlanInstances "$(sharedFunctionAppServicePlanInstances)" -sharedFunctionAppServicePlanTier "$(sharedFunctionAppServicePlanTier)" -runnerAppServicePlanSize "$(RunnerAppServicePlanSize)" -runnerAppServicePlanTier "$(RunnerAppServicePlanTier)" -runnerAppServicePlanName "$(RunnerAppServicePlanName)" -funcsSubnetName "$(funcsSubnetName)"'
+
+        - task: AzureResourceManagerTemplateDeployment@3
+          displayName: 'Deploy monitoring resources'
+          inputs:
+            azureResourceManagerConnection: '${{ parameters.AzureServiceConnection }}'
+            subscriptionId: '$(AzureSubscription)'
+            resourceGroupName: '$(AlertingResourceGroupName)'
+            location: 'UK South'
+            csmFile: '$(Pipeline.Workspace)/DigitalForms.ArmTemplates.Shared/monitoring/template.json'
+            deploymentName: 'df-alerting-infrastructure'
+            overrideParameters: '-environmentTag "$(EnvironmentTag)" -parentBusinessTag "$(ParentBusinessTag)" -portfolioTag "$(PortfolioTag)" -productTag "$(ProductTag)" -serviceLineTag "$(ServiceLineTag)" -serviceTag "$(ServiceTag)" -serviceOfferingTag "$(ServiceOfferingTag)" -alertingHostingPlanName "$(AlertingHostingPlanName)" -alertingFunctionAppName "$(AlertingFunctionAppName)" -alertingStorageAccount "$(AlertingStorageAccount)" -sharedResourceGroupName "$(SharedResourceGroupName)" -sharedAppInsights "$(SharedAppInsightsName)" -sharedKeyVaultName "$(SharedKeyVaultName)" -sharedActionGroupName "$(SharedActionGroup)" -alertingActionGroupName "$(AlertingActionGroup)"'
+
+        - task: AzureCLI@2
+          displayName: Deploy monitoring app
+          inputs:
+            azureSubscription: '${{ parameters.AzureServiceConnection }}'
+            scriptType: ps
+            scriptLocation: inlineScript
+            inlineScript: |
+              az webapp deploy --type zip --clean true --resource-group $(AlertingResourceGroupName) --name $(AlertingFunctionAppName) --src-path '$(Pipeline.Workspace)/DigitalForms.Functions.Monitoring/DigitalForms.Platform.Monitoring.Functions.zip'
+
+        - task: AzureResourceManagerTemplateDeployment@3
+          displayName: 'Deploy alerts'
+          inputs:
+            azureResourceManagerConnection: '${{ parameters.AzureServiceConnection }}'
+            subscriptionId: '$(AzureSubscription)'
+            resourceGroupName: '$(SharedResourceGroupName)'
+            location: 'UK South'
+            csmFile: '$(Pipeline.Workspace)/DigitalForms.ArmTemplates.Shared/alerts/template.json'
+            deploymentName: 'df-shared-alerting'
+            overrideParameters: '-environmentTag "$(EnvironmentTag)" -parentBusinessTag "$(ParentBusinessTag)" -portfolioTag "$(PortfolioTag)" -productTag "$(ProductTag)" -serviceLineTag "$(ServiceLineTag)" -serviceTag "$(ServiceTag)" -serviceOfferingTag "$(ServiceOfferingTag)" -sharedAppServicePlanName "$(SharedAppServicePlanName)"  -sharedRedisCacheName "$(SharedRedisInstanceName)" -sharedKeyVaultName "$(SharedKeyVaultName)" -sharedStorageAccountName "$(SharedStorageName)" -sharedActionGroupName "$(SharedActionGroup)"'

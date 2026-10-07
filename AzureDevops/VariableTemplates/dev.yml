@@ -1,0 +1,38 @@
+﻿variables:
+  ResourcePrefix: s255d01
+  AzureSubscription: '51199e9b-8fa9-4269-825e-fa5d7cc2b857'
+  DeploymentServicePrincipal: '4e8b466b-fc87-4c57-8ce1-c393a726f348'
+  DeploySharedContainerRegistry: true
+  FormsCollectionThroughput: 400
+  NodeEnvironmentAppSetting: development
+  SharedAppServicePlanInstances: 1
+  SharedAppServicePlanSize: 2
+  SharedAppServicePlanTier: PremiumV2
+  RunnerAppServicePlanInstances: 1
+  RunnerAppServicePlanSize: 2
+  RunnerAppServicePlanTier: PremiumV2
+  SharedFunctionAppServicePlanInstances: 1
+  SharedFunctionAppServicePlanSize: 2
+  SharedFunctionAppServicePlanTier: PremiumV2
+  SharedRedisInstanceCount: 1
+  SharedRedisInstanceFamily: C
+  SharedRedisInstanceSku: Basic
+
+  # External API app service config
+  ExternalAppServicePlanInstances: 2
+  ExternalAppServicePlanSize: 2
+  ExternalAppServicePlanTier: PremiumV2
+
+  # Tags
+  EnvironmentTag: Dev
+  ServiceTag: 'Funding and Allocations'
+  ServiceLineTag: 'Funding'
+  ParentBusinessTag: 'Funding and Allocations'
+  PortfolioTag: 'Grant Management Service'
+  ProductTag: 'Funding Service Digital Forms'
+  ServiceOfferingTag: 'Digital Forms'
+
+  # Shared Database
+  SharedDatabaseSku: P1
+  SharedDatabaseTier: Premium
+  SharedDatabaseSizeBytes: 10737418240

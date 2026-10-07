@@ -1,0 +1,32 @@
+variables:
+  ResourcePrefix: s255t03
+  AzureSubscription: 'c4542a65-affe-40bb-a9c0-33fc31feb3c9'
+  DeploymentServicePrincipal: 'e35197b9-684d-4b77-9b90-2d792b6d5e42'
+  DeploySharedContainerRegistry: false
+  FormsCollectionThroughput: 30000
+  NodeEnvironmentAppSetting: preprod
+  SharedAppServicePlanInstances: 1
+  SharedAppServicePlanSize: 3
+  SharedAppServicePlanTier: PremiumV2
+  SharedFunctionAppServicePlanInstances: 1
+  SharedFunctionAppServicePlanSize: 2
+  SharedFunctionAppServicePlanTier: PremiumV3
+  SharedRedisInstanceCount: 2
+  SharedRedisInstanceFamily: C
+  SharedRedisInstanceSku: Basic
+  RunnerAppServicePlanInstances: 2
+  RunnerAppServicePlanSize: 3
+  RunnerAppServicePlanTier: PremiumV3
+
+  # External API app service config
+  ExternalAppServicePlanInstances: 2
+  ExternalAppServicePlanSize: 3
+  ExternalAppServicePlanTier: PremiumV3
+
+  # Tags
+  EnvironmentTag: Data-Science
+
+  # Shared Database
+  SharedDatabaseSku: P2
+  SharedDatabaseTier: Premium
+  SharedDatabaseSizeBytes: 21474836480

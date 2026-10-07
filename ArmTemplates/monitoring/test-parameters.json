@@ -1,0 +1,51 @@
+﻿{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environmentTag": {
+            "value": "Dev"
+        },
+        "parentBusinessTag": {
+            "value": "Funding and Allocations"
+        },
+        "portfolioTag": {
+            "value": "Education and Skills Funding Agency"
+        },
+        "productTag": {
+            "value": "Funding Service Digital Forms"
+        },
+        "serviceTag": {
+            "value": "Funding and Allocations"
+        },
+        "serviceLineTag": {
+            "value": "Funding"
+        },
+        "serviceOfferingTag": {
+            "value": "Plan Your Grant"
+        },
+        "alertingHostingPlanName": {
+            "value": "s255d01rg-df-alerting"
+        },
+        "alertingFunctionAppName": {
+            "value": "s255d01fa-df-alerting"
+        },
+        "alertingStorageAccount": {
+            "value": "s255d01strdfalerts"
+        },
+        "sharedResourceGroupName": {
+            "value": "s255d01rg-df-shared"
+        },
+        "sharedAppInsights": {
+            "value": "ASharedAppInsightsInstance"
+        },
+        "sharedKeyVaultName": {
+            "value": "ASharedKeyVault"
+        },
+        "sharedActionGroupName": {
+            "value": "ASharedActionGroup"
+        },
+        "alertingActionGroupName": {
+            "value": "AnAlertingActionGroup"
+        }
+    }
+}

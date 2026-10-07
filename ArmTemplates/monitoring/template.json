@@ -1,0 +1,526 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environmentTag": {
+            "type": "string"
+        },
+        "portfolioTag": {
+            "type": "string"
+        },
+        "serviceLineTag": {
+            "type": "string"
+        },
+        "serviceTag": {
+            "type": "string"
+        },
+        "productTag": {
+            "type": "string"
+        },
+        "serviceOfferingTag": {
+            "type": "string"
+        },
+        "parentBusinessTag": {
+            "type": "string"
+        },
+        "alertingHostingPlanName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the consumption-based hosting plan used for passing alerts to slack"
+            }
+        },
+        "alertingFunctionAppName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the function app used for passing alerts to slack"
+            }
+        },
+        "alertingStorageAccount": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the storage account used by the alerting function for storage purposes"
+            }
+        },
+        "sharedResourceGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the shared resource group"
+            }
+        },
+        "sharedAppInsights": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the shared application insights instance"
+            }
+        },
+        "sharedKeyVaultName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the shared key vault"
+            }
+        },
+        "sharedActionGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the shared alerting action group"
+            }
+        },
+        "alertingActionGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the action group to monitor the alerting resources"
+            }
+        }
+    },
+    "variables": {
+        "fundingBuildingBlocksUrl": "https://raw.githubusercontent.com/SkillsFundingAgency/funding-platform-building-blocks/main/templates/",
+        "targetSlackChannel": "digital-forms-alerting",
+        "functionAppAlertRules": [
+            {
+                "MetricName": "Http5xx",
+                "Operator": "GreaterThan",
+                "Threshold": "5",
+                "Aggregation": "Average",
+                "ResourceType": "Microsoft.Web/sites",
+                "ResourceName": "[parameters('alertingFunctionAppName')]",
+                "WindowSize": "PT5M"
+            },
+            {
+                "MetricName": "Http4xx",
+                "Operator": "GreaterThan",
+                "Threshold": "0",
+                "Aggregation": "Average",
+                "ResourceType": "Microsoft.Web/sites",
+                "ResourceName": "[parameters('alertingFunctionAppName')]",
+                "WindowSize": "PT5M"
+            },
+            {
+                "MetricName": "HttpResponseTime",
+                "Operator": "GreaterThan",
+                "Threshold": "10",
+                "Aggregation": "Average",
+                "ResourceType": "Microsoft.Web/sites",
+                "ResourceName": "[parameters('alertingFunctionAppName')]",
+                "WindowSize": "PT5M"
+            }
+        ]
+    },
+    "resources": [
+        {
+            "name": "alertingStorageAccount",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'storage-account-arm.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceTag": {
+                        "value": "[parameters('serviceTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "serviceOfferingTag": {
+                        "value": "[parameters('serviceOfferingTag')]"
+                    },
+                    "storageAccountName": {
+                        "value": "[parameters('alertingStorageAccount')]"
+                    },
+                    "storageKind": {
+                        "value": "StorageV2"
+                    },
+                    "enableCors": {
+                        "value": "True"
+                    },
+                    "allowedMethods": {
+                        "value": [ "GET", "POST", "PUT" ]
+                    },
+                    "minimumTlsVersion": {
+                        "value": "TLS1_2"
+                    },
+                    "allowBlobPublicAccess": {
+                        "value": false
+                    }
+                }
+            }
+        },
+        {
+            "name": "[parameters('alertingHostingPlanName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2021-03-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "Environment": "[parameters('environmentTag')]",
+                "Parent Business": "[parameters('parentBusinessTag')]",
+                "Portfolio": "[parameters('portfolioTag')]",
+                "Product": "[parameters('productTag')]",
+                "Service": "[parameters('serviceTag')]",
+                "Service Line": "[parameters('serviceLineTag')]",
+                "Service Offering": "[parameters('serviceOfferingTag')]"
+            },
+            "kind": "functionapp",
+            "sku": {
+                "name": "Y1",
+                "tier": "Dynamic",
+                "family": "Y",
+                "capacity": 0
+            },
+            "properties": {
+                "name": "[parameters('alertingHostingPlanName')]"
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "name": "sharedAlertingFunctionApp",
+            "dependsOn": [
+                "alertingStorageAccount",
+                "[parameters('alertingHostingPlanName')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'function-app.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "functionAppName": {
+                        "value": "[parameters('alertingFunctionAppName')]"
+                    },
+                    "appServicePlanName": {
+                        "value": "[parameters('alertingHostingPlanName')]"
+                    },
+                    "appServicePlanResourceGroup" :{
+                        "value": "[resourceGroup().name]"
+                    },
+                    "functionAppAppSettings": {
+                        "value": [
+                            {
+                                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                                "value": "[reference(resourceId(parameters('sharedResourceGroupName'), 'Microsoft.Insights/components', parameters('sharedAppInsights')), '2014-04-01').InstrumentationKey]"
+                            },
+                            {
+                                "name": "AzureWebJobsStorage",
+                                "value": "[reference('alertingStorageAccount').outputs.storageConnectionString.value]"
+                            },
+                            {
+                                "name": "AzureWebJobsDashboard",
+                                "value": "[reference('alertingStorageAccount').outputs.storageConnectionString.value]"
+                            },
+                            {
+                                "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                                "value": "[reference('alertingStorageAccount').outputs.storageConnectionString.value]"
+                            },
+                            {
+                                "name": "WEBSITE_CONTENTSHARE",
+                                "value": "[parameters('alertingFunctionAppName')]"
+                            },
+                            {
+                                "name": "FUNCTIONS_WORKER_RUNTIME",
+                                "value": "powershell"
+                            },
+                            {
+                                "name": "FUNCTIONS_EXTENSION_VERSION",
+                                "value": "~4"
+                            },
+                            {
+                                "name": "SlackWebhookUri",
+                                "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId(parameters('sharedResourceGroupName'), 'Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'SlackWebhookUri'),'2018-02-14').SecretUri, ')')]"
+                            },
+                            {
+                                "name": "MSDEPLOY_RENAME_LOCKED_FILES",
+                                "value": "1"
+                            },
+                            {
+                                "name": "SlackDefaultChannel",
+                                "value": "[variables('targetSlackChannel')]"
+                            },
+                            {
+                                "name": "SlackIconEmoji",
+                                "value": ":mega:"
+                            },
+                            {
+                                "name": "SlackUsername",
+                                "value": "AzureAlerts"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "resourceGroup": "[parameters('sharedResourceGroupName')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "name": "alertingFunctionAppKvAccessPolicy",
+            "dependsOn": [
+                "sharedAlertingFunctionApp"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'keyvault-accesspolicies.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "keyVaultName": {
+                        "value": "[parameters('sharedKeyVaultName')]"
+                    },
+                    "accessPolicies": {
+                        "value": [
+                            {
+                                "tenantId": "[subscription().tenantId]",
+                                "objectId": "[reference('sharedAlertingFunctionApp').outputs.managedServiceIdentityId.value]",
+                                "permissions": {
+                                    "secrets": [
+                                        "list",
+                                        "get"
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "resourceGroup": "[parameters('sharedResourceGroupName')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "name": "sharedActionGroup",
+            "dependsOn": [
+                "sharedAlertingFunctionApp"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'action-group.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "actionGroupName": {
+                        "value": "[parameters('sharedActionGroupName')]"
+                    },
+                    "actionGroupShortName": {
+                        "value": "[take(parameters('sharedActionGroupName'), 12)]"
+                    },
+                    "webhookReceiverName": {
+                        "value": "SendAlertToSlack"
+                    },
+                    "webhookServiceUri": {
+                        "value": "[concat('https://', parameters('alertingFunctionAppName'), '.azurewebsites.net/api/webhooks/common-alert?code=', listkeys(concat(resourceId(resourceGroup().name, 'Microsoft.Web/sites', parameters('alertingFunctionAppName')), '/host/default/'), '2018-11-01').functionKeys.default)]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "name": "alertingActionGroup",
+            "dependsOn": [
+                "sharedAlertingFunctionApp"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'action-group.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "actionGroupName": {
+                        "value": "[parameters('alertingActionGroupName')]"
+                    },
+                    "actionGroupShortName": {
+                        "value": "[take(parameters('alertingActionGroupName'), 12)]"
+                    },
+                    "emailActionName": {
+                        "value": "SendToEmail"
+                    },
+                    "emailAddress": {
+                        "value": "FundingDevOps@education.gov.uk"
+                    },
+                    "emailReceiversStatus": {
+                        "value": "enabled"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "name": "[concat(variables('functionAppAlertRules')[copyIndex()].ResourceName, '-', replace(variables('functionAppAlertRules')[copyIndex()].MetricName, '/', '-'))]",
+            "dependsOn": [
+                "alertingActionGroup"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'),'alert-rules.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "serviceOfferingTag": {
+                        "value": "[parameters('serviceOfferingTag')]"
+                    },
+                    "alertName": {
+                        "value": "[concat(variables('functionAppAlertRules')[copyIndex()].ResourceName, '-metric-', replace(variables('functionAppAlertRules')[copyIndex()].MetricName, '/', '-'))]"
+                    },
+                    "metricName": {
+                        "value": "[variables('functionAppAlertRules')[copyIndex()].MetricName]"
+                    },
+                    "operator": {
+                        "value": "[variables('functionAppAlertRules')[copyIndex()].Operator]"
+                    },
+                    "threshold": {
+                        "value": "[variables('functionAppAlertRules')[copyIndex()].Threshold]"
+                    },
+                    "aggregation": {
+                        "value": "[variables('functionAppAlertRules')[copyIndex()].Aggregation]"
+                    },
+                    "actionGroupName": {
+                        "value": "[parameters('alertingActionGroupName')]"
+                    },
+                    "windowSize": {
+                        "value": "[variables('functionAppAlertRules')[copyIndex()].WindowSize]"
+                    },
+                    "resourceId": {
+                        "value": "[resourceId(variables('functionAppAlertRules')[copyIndex()].ResourceType, variables('functionAppAlertRules')[copyIndex()].ResourceName)]"
+                    }
+                }
+            },
+            "copy": {
+                "name": "AlertRulesCopy",
+                "count": "[length(variables('functionAppAlertRules'))]"
+            }
+        },
+        {
+            "apiVersion": "2021-04-01",
+            "name": "[concat(parameters('alertingFunctionAppName'), '-failed-executions')]",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "alertingActionGroup",
+                "sharedAlertingFunctionApp"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('fundingBuildingBlocksUrl'), 'alert-rules-app-insights-query.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "serviceOfferingTag": {
+                        "value": "[parameters('serviceOfferingTag')]"
+                    },
+                    "alertName": {
+                        "value": "[concat(parameters('alertingFunctionAppName'), '-failed-executions')]"
+                    },
+                    "query": {
+                        "value": "[concat('requests | where cloud_RoleName == \"', parameters('alertingFunctionAppName'), '\" | where success == false')]"
+                    },
+                    "actionGroupResourceGroup": {
+                        "value": "[resourceGroup().name]"
+                    },
+                    "actionGroupName": {
+                        "value": "[parameters('alertingActionGroupName')]"
+                    },
+                    "appInsightsResourceGroup": {
+                        "value": "[parameters('sharedResourceGroupName')]"
+                    },
+                    "appInsightsName": {
+                        "value": "[parameters('sharedAppInsights')]"
+                    }
+                }
+            }
+        }
+    ]
+}

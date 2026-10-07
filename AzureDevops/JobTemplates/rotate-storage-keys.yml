@@ -1,0 +1,59 @@
+parameters:
+- name: Environment
+  type: string
+- name: AzureServiceConnection
+  type: string
+- name: StorageAccountName
+  type: string
+- name: StorageAccountResourceGroup
+  type: string
+- name: KeyVaultName
+  type: string
+
+jobs:
+- deployment: DeployTo${{ parameters.Environment }}
+  displayName: "Deploy To ${{ parameters.Environment }}"
+  environment: Digital Forms - ${{ parameters.Environment }}
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - task: AzureCLI@2
+          displayName: 'Rotating storage keys'
+          inputs:
+            azureSubscription: '${{ parameters.AzureServiceConnection }}'
+            scriptType: pscore
+            scriptLocation: inlineScript
+            inlineScript: |
+              $weekOfYear = Get-date -UFormat %V
+
+              $isEvenWeek = ($weekOfYear % 2) -eq 0
+
+              $keyToSwap = "key1"
+
+              if(-not $isEvenWeek) {
+                $keyToSwap = "key2"
+              }
+
+              Write-Host "Updating storage account key $keyToSwap".
+
+              ## Rotate key...
+              az storage account keys renew -g ${{ parameters.StorageAccountResourceGroup }} -n ${{ parameters.StorageAccountName }} --key $keyToSwap | Out-Null
+
+              ## Get new connection string
+              $connStrJson = az storage account show-connection-string -g ${{ parameters.StorageAccountResourceGroup }} -n ${{ parameters.StorageAccountName }} --key $keyToSwap
+
+              $connStrObj = $connStrJson | ConvertFrom-Json
+
+              $connstr = $connStrObj.connectionString
+
+              ## Remove unnessecery elements
+
+              $splitString = $connstr -split ';'
+
+              $newString = $splitString[0] + ";" + $splitString[1] + ";" + $splitString[2] + ";" + $splitString[3]
+
+              ## Push new key to key vault.
+              az keyvault secret set --name AzureStorageConnectionString --vault-name ${{ parameters.KeyVaultName }} --value $newString | Out-Null
+
+              Write-Host "Updated connection string saved to key vault"

@@ -1,0 +1,56 @@
+﻿variables:
+  # Resource group
+  SharedResourceGroupName: $(ResourcePrefix)rg-uks-df-shared
+
+  # Shared resources
+  SharedAppInsightsName: $(ResourcePrefix)ai-df-shared
+  SharedAppServicePlanName: $(ResourcePrefix)asp-df-shared
+  RunnerAppServicePlanName: $(ResourcePrefix)asp-df-runner
+  SharedLinuxFunctionAppServicePlanName: $(ResourcePrefix)asp-df-funcs-linux
+  SharedContainerRegistryName: $(ResourcePrefix)acrdfshared
+  SharedCosmosAccount: $(ResourcePrefix)cdb-df-shared
+  SharedKeyVaultName: $(ResourcePrefix)kv-df-shared
+  SharedLogAnalyticsName: $(ResourcePrefix)la-df-shared
+  SharedRedisInstanceName: $(ResourcePrefix)rds-df-shared
+  SharedRouteTableName: $(ResourcePrefix)rt-df-shared
+  SharedNetworkSecurityGroupName: $(ResourcePrefix)nsg-df-shared
+  SharedStorageName: $(ResourcePrefix)strdfshared
+  SharedAuditStorageName: $(ResourcePrefix)strdfaudit
+  SharedSubnetName: $(ResourcePrefix)subnet-df-shared
+  RunnerSubnetName: $(ResourcePrefix)subnet-df-runner
+  FuncsSubnetName: $(ResourcePrefix)subnet-df-funcs
+  SharedVirtualNetworkName: $(ResourcePrefix)vnet-df-shared
+  AppServiceResourceGroupName: $(ResourcePrefix)rg-uks-df-app-services
+  DesignerAppServiceName: $(ResourcePrefix)as-df-designer
+  RunnerAppServiceName: $(ResourcePrefix)as-df-runner
+  sharedServiceBusName: $(ResourcePrefix)sbns-df-shared
+
+
+  ## SQL Server/Databases
+  SharedSqlServerName:  $(ResourcePrefix)sql-df-shared
+  SharedSqlDatabaseName: $(ResourcePrefix)db-df-shared
+  SharedSqlAdminUserName: $(ResourcePrefix)-sql-admin
+  SharedSqlAzureAdAdmin:  AZURE AAD FUNDING DEVOPS ADMIN
+  SharedSqlAzureAdObjectId: be5842d5-a6fa-491f-b984-b9265185b221
+  SharedSqlThreatDetectionEmailAddress: FundingDevops@education.gov.uk
+  SharedSqlServerEnableFirewall: true
+
+  # External API config
+  ExternalSubnetName: $(ResourcePrefix)subnet-df-external
+  ExternalLinuxAppServicePlanName: $(ResourcePrefix)asp-df-external-linux
+
+  # Alerting configuration
+  AlertingResourceGroupName: $(ResourcePrefix)rg-uks-df-alerting
+  AlertingFunctionAppName: $(ResourcePrefix)fa-df-alerting
+  AlertingHostingPlanName: $(ResourcePrefix)asp-df-alerting
+  AlertingStorageAccount: $(ResourcePrefix)strdfalerting
+  AlertingActionGroup: $(ResourcePrefix)ag-alerts
+  SharedActionGroup: $(ResourcePrefix)ag-shared
+
+  # Tags
+  ServiceTag: 'Funding and Allocations'
+  ServiceLineTag: 'Funding'
+  ParentBusinessTag: 'Funding and Allocations'
+  PortfolioTag: 'Grant Management Service'
+  ProductTag: 'Funding Service Digital Forms'
+  ServiceOfferingTag: 'Digital Forms'
