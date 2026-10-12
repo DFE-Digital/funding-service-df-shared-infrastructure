@@ -332,7 +332,7 @@
         }
     },
     "variables": {
-        "fundingBuildingBlocksUrl": "https://raw.githubusercontent.com/SkillsFundingAgency/funding-platform-building-blocks/main/templates/"
+        "fundingBuildingBlocksUrl": "https://raw.githubusercontent.com/SkillsFundingAgency/funding-platform-building-blocks/rabia_temp/templates/"
     },
     "resources": [
          {
