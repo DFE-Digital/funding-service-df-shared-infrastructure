@@ -1509,6 +1509,9 @@
                     "storageAccountName": {
                         "value": "[parameters('sharedAuditStorageName')]"
                     },
+                    "storageKind": {
+                        "value": "StorageV2"
+                    },
                     "enableCors": {
                         "value": "True"
                     },
@@ -1585,6 +1588,9 @@
                     },
                     "sqlStorageAccountName": {
                         "value": "[parameters('sharedAuditStorageName')]"
+                    },
+                    "securityAlertPolicyName": {
+                        "value": "Default"
                     }
                 }
             }
